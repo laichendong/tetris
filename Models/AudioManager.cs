@@ -80,13 +80,14 @@ namespace TetrisGame.Models
                 }
                 else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
-                    // Windows 使用 PowerShell
+                    // Windows 使用简化的 PowerShell 命令
                     _audioProcess = Process.Start(new ProcessStartInfo
                     {
                         FileName = "powershell",
-                        Arguments = $"-c \"(New-Object Media.SoundPlayer '{_tempAudioFile}').PlaySync()\"",
+                        Arguments = $"-Command \"Add-Type -AssemblyName presentationCore; $m = New-Object System.Windows.Media.MediaPlayer; $m.Open('{_tempAudioFile}'); $m.Play(); Start-Sleep 3\"",
                         UseShellExecute = false,
-                        CreateNoWindow = true
+                        CreateNoWindow = true,
+                        WindowStyle = ProcessWindowStyle.Hidden
                     });
                 }
                 else
@@ -221,13 +222,14 @@ namespace TetrisGame.Models
                 }
                 else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
-                    // Windows 使用 PowerShell
+                    // Windows 使用简化的 PowerShell 命令
                     gameOverProcess = Process.Start(new ProcessStartInfo
                     {
                         FileName = "powershell",
-                        Arguments = $"-c \"(New-Object Media.SoundPlayer '{tempGameOverFile}').PlaySync()\"",
+                        Arguments = $"-Command \"Add-Type -AssemblyName presentationCore; $m = New-Object System.Windows.Media.MediaPlayer; $m.Open('{tempGameOverFile}'); $m.Play(); Start-Sleep 3\"",
                         UseShellExecute = false,
-                        CreateNoWindow = true
+                        CreateNoWindow = true,
+                        WindowStyle = ProcessWindowStyle.Hidden
                     });
                 }
                 else
@@ -299,13 +301,14 @@ namespace TetrisGame.Models
                     }
                     else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                     {
-                        // Windows 使用 PowerShell
+                        // Windows 使用简化的 PowerShell 命令
                         clearSoundProcess = Process.Start(new ProcessStartInfo
                         {
                             FileName = "powershell",
-                            Arguments = $"-c \"(New-Object Media.SoundPlayer '{_tempClearSoundFile}').PlaySync()\"",
+                            Arguments = $"-Command \"Add-Type -AssemblyName presentationCore; $m = New-Object System.Windows.Media.MediaPlayer; $m.Open('{_tempClearSoundFile}'); $m.Play(); Start-Sleep 1\"",
                             UseShellExecute = false,
-                            CreateNoWindow = true
+                            CreateNoWindow = true,
+                            WindowStyle = ProcessWindowStyle.Hidden
                         });
                     }
                     else
@@ -406,13 +409,14 @@ namespace TetrisGame.Models
                 }
                 else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
-                    // Windows 使用 PowerShell
+                    // Windows 使用简化的 PowerShell 命令
                     soundProcess = Process.Start(new ProcessStartInfo
                     {
                         FileName = "powershell",
-                        Arguments = $"-c \"(New-Object Media.SoundPlayer '{tempSoundFile}').PlaySync()\"",
+                        Arguments = $"-Command \"Add-Type -AssemblyName presentationCore; $m = New-Object System.Windows.Media.MediaPlayer; $m.Open('{tempSoundFile}'); $m.Play(); Start-Sleep 1\"",
                         UseShellExecute = false,
-                        CreateNoWindow = true
+                        CreateNoWindow = true,
+                        WindowStyle = ProcessWindowStyle.Hidden
                     });
                 }
                 else
