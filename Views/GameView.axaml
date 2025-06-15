@@ -1,0 +1,246 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             x:Class="TetrisGame.Views.GameView"
+             Focusable="True">
+  <UserControl.Background>
+    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+      <GradientStop Color="#f8f9fa" Offset="0"/>
+      <GradientStop Color="#e9ecef" Offset="0.5"/>
+      <GradientStop Color="#dee2e6" Offset="1"/>
+    </LinearGradientBrush>
+  </UserControl.Background>
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+    </Grid.RowDefinitions>
+    
+    <!-- 游戏标题 -->
+    <Border Grid.Row="0" Margin="20,13,20,7">
+      <TextBlock Text="俄罗斯方块" 
+                 FontSize="42" 
+                 FontWeight="Bold" 
+                 HorizontalAlignment="Center">
+        <TextBlock.Foreground>
+          <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+            <GradientStop Color="#64b5f6" Offset="0"/>
+            <GradientStop Color="#81c784" Offset="0.3"/>
+            <GradientStop Color="#ffb74d" Offset="0.6"/>
+            <GradientStop Color="#e57373" Offset="1"/>
+          </LinearGradientBrush>
+        </TextBlock.Foreground>
+        <TextBlock.Effect>
+          <DropShadowEffect Color="#40000000" OffsetX="2" OffsetY="2" BlurRadius="8"/>
+        </TextBlock.Effect>
+      </TextBlock>
+    </Border>
+    
+    <!-- 游戏信息面板 -->
+    <Border Grid.Row="1" Margin="15,5,15,10" Padding="20,15" CornerRadius="15" Background="White">
+      <Border.BoxShadow>
+         0 4 12 0 #20000000
+       </Border.BoxShadow>
+      <StackPanel Spacing="10">
+        <Grid ColumnDefinitions="*,*,*,*" RowDefinitions="Auto,Auto">
+          <!-- 分数 -->
+          <Border Grid.Column="0" Padding="10,8" Margin="5" CornerRadius="12" Background="#bbdefb">
+            <Border.BoxShadow>
+              0 2 6 0 #20000000
+            </Border.BoxShadow>
+            <StackPanel Spacing="3">
+              <TextBlock Text="分数" FontSize="12" Foreground="#37474f" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+              <TextBlock x:Name="ScoreText" Text="0" FontSize="16" FontWeight="Bold" Foreground="#1565c0" HorizontalAlignment="Center"/>
+            </StackPanel>
+          </Border>
+          <!-- 已消除行数 -->
+          <Border Grid.Column="1" Padding="10,8" Margin="5" CornerRadius="12" Background="#c8e6c9">
+            <Border.BoxShadow>
+              0 2 6 0 #20000000
+            </Border.BoxShadow>
+            <StackPanel Spacing="3">
+              <TextBlock Text="消除行数" FontSize="12" Foreground="#37474f" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+              <TextBlock x:Name="LinesText" Text="0" FontSize="16" FontWeight="Bold" Foreground="#2e7d32" HorizontalAlignment="Center"/>
+            </StackPanel>
+          </Border>
+          <!-- 关卡 -->
+          <Border Grid.Column="2" Padding="10,8" Margin="5" CornerRadius="12" Background="#ffe0b2">
+            <Border.BoxShadow>
+              0 2 6 0 #20000000
+            </Border.BoxShadow>
+            <StackPanel Spacing="3">
+              <TextBlock Text="关卡" FontSize="12" Foreground="#37474f" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+              <TextBlock x:Name="LevelText" Text="1" FontSize="16" FontWeight="Bold" Foreground="#ef6c00" HorizontalAlignment="Center"/>
+            </StackPanel>
+          </Border>
+          <!-- 难度 -->
+          <Border Grid.Column="3" Padding="10,8" Margin="5" CornerRadius="12" Background="#ffcdd2">
+            <Border.BoxShadow>
+              0 2 6 0 #20000000
+            </Border.BoxShadow>
+            <StackPanel Spacing="3">
+              <TextBlock Text="难度" FontSize="12" Foreground="#37474f" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+              <TextBlock x:Name="DifficultyText" Text="中等" FontSize="16" FontWeight="Bold" Foreground="#c62828" HorizontalAlignment="Center"/>
+            </StackPanel>
+          </Border>
+        </Grid>
+      </StackPanel>
+    </Border>
+    
+    <!-- 游戏主区域 -->
+    <Grid Grid.Row="2" Margin="10,5,10,20">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="140"/>
+      </Grid.ColumnDefinitions>
+      
+      <!-- 游戏板 -->
+      <Border Grid.Column="0" 
+              Padding="0"
+              HorizontalAlignment="Center"
+              VerticalAlignment="Top">
+        
+        <Border 
+                BorderBrush="#90a4ae" 
+                BorderThickness="3" 
+                CornerRadius="3" 
+                Background="#12033a">
+        <Border.BoxShadow>
+           0 6 20 0 #30000000
+        </Border.BoxShadow>
+          <Canvas x:Name="GameCanvas" 
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Top">
+            <!-- The actual size will be set in code-behind based on BlockSize -->
+            <!-- 游戏方块将在代码中动态添加 -->
+          </Canvas>
+        </Border>
+      </Border>
+      
+      <!-- 侧边信息面板 -->
+      <StackPanel Grid.Column="1" Margin="10,0,0,0" Spacing="20">
+        <!-- 下一个方块预览 -->
+        <Border Padding="12" CornerRadius="15" Background="White">
+          <Border.BoxShadow>
+             0 4 12 0 #20000000
+           </Border.BoxShadow>
+          <StackPanel Spacing="8">
+            <TextBlock Text="下一个方块" FontSize="12" FontWeight="SemiBold" Foreground="#37474f" HorizontalAlignment="Center"/>
+            <Border BorderBrush="#90a4ae" 
+                    BorderThickness="2" 
+                    Background="#12033a" 
+                    Width="100" 
+                    Height="100"
+                    CornerRadius="3">
+              <Border.BoxShadow>
+                 inset 0 2 5 0 #20000000
+               </Border.BoxShadow>
+              <Canvas x:Name="NextBlockCanvas">
+                <!-- 下一个方块将在代码中动态添加 -->
+              </Canvas>
+            </Border>
+          </StackPanel>
+        </Border>
+        
+        <!-- 游戏控制信息 -->
+        <Border Padding="12" CornerRadius="15" Background="White">
+          <Border.BoxShadow>
+             0 4 12 0 #20000000
+           </Border.BoxShadow>
+          <StackPanel Spacing="6">
+            <TextBlock Text="游戏控制" FontSize="12" FontWeight="SemiBold" Foreground="#37474f" HorizontalAlignment="Center"/>
+            <StackPanel Spacing="4">
+              <Border Padding="6,3" CornerRadius="6" Background="#f5f5f5">
+                <TextBlock Text="← → : 移动" FontSize="10" Foreground="#616161"/>
+              </Border>
+              <Border Padding="6,3" CornerRadius="6" Background="#f5f5f5">
+                <TextBlock Text="↑ : 旋转" FontSize="10" Foreground="#616161"/>
+              </Border>
+              <Border Padding="6,3" CornerRadius="6" Background="#f5f5f5">
+                <TextBlock Text="↓ : 加速下落" FontSize="10" Foreground="#616161"/>
+              </Border>
+              <Border Padding="6,3" CornerRadius="6" Background="#f5f5f5">
+                <TextBlock Text="空格 : 快速下落" FontSize="10" Foreground="#616161"/>
+              </Border>
+              <Border Padding="6,3" CornerRadius="6" Background="#f5f5f5">
+                <TextBlock Text="回车 : 暂停/继续" FontSize="10" Foreground="#616161"/>
+              </Border>
+            </StackPanel>
+          </StackPanel>
+        </Border>
+      </StackPanel>
+    </Grid>
+    
+
+    
+    <!-- 暂停覆盖层 -->
+    <Border x:Name="PausePanel" 
+            Grid.Row="0" 
+            Grid.RowSpan="3" 
+            Background="#80000000" 
+            IsVisible="False">
+      <Border VerticalAlignment="Center" 
+              HorizontalAlignment="Center" 
+              Padding="30,25" 
+              CornerRadius="20" 
+              Background="White">
+        <Border.BoxShadow>
+           0 10 25 0 #40000000
+         </Border.BoxShadow>
+        <StackPanel Spacing="20">
+          <TextBlock Text="游戏暂停" 
+                     FontSize="28" 
+                     FontWeight="Bold" 
+                     HorizontalAlignment="Center">
+            <TextBlock.Foreground>
+              <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                <GradientStop Color="#ffb74d" Offset="0"/>
+                <GradientStop Color="#ffa726" Offset="1"/>
+              </LinearGradientBrush>
+            </TextBlock.Foreground>
+          </TextBlock>
+          <TextBlock Text="按回车键继续游戏" 
+                     FontSize="14" 
+                     HorizontalAlignment="Center"
+                     Foreground="#616161"/>
+        </StackPanel>
+      </Border>
+    </Border>
+    
+    <!-- 游戏结束覆盖层 -->
+    <Border x:Name="GameOverPanel" 
+            Grid.Row="0" 
+            Grid.RowSpan="3" 
+            Background="#90000000" 
+            IsVisible="False">
+      <Border VerticalAlignment="Center" 
+              HorizontalAlignment="Center" 
+              Padding="40,30" 
+              CornerRadius="25" 
+              Background="White">
+        <Border.BoxShadow>
+           0 12 30 0 #50000000
+         </Border.BoxShadow>
+        <StackPanel Spacing="25">
+          <TextBlock Text="游戏结束!" 
+                     FontSize="36" 
+                     FontWeight="Bold" 
+                     HorizontalAlignment="Center">
+            <TextBlock.Foreground>
+              <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                <GradientStop Color="#ef5350" Offset="0"/>
+                <GradientStop Color="#f44336" Offset="1"/>
+              </LinearGradientBrush>
+            </TextBlock.Foreground>
+          </TextBlock>
+          <TextBlock Text="按回车键重新开始" 
+                     FontSize="16" 
+                     HorizontalAlignment="Center"
+                     Foreground="#616161"/>
+        </StackPanel>
+      </Border>
+    </Border>
+  </Grid>
+</UserControl>

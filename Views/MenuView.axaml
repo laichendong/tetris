@@ -1,0 +1,282 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             x:Class="TetrisGame.Views.MenuView"
+             Background="#f8f9fa">
+  <UserControl.Styles>
+    <!-- 简单难度按钮样式 -->
+    <Style Selector="Button.easy">
+      <Setter Property="Background" Value="#81c784"/>
+      <Setter Property="Foreground" Value="White"/>
+      <Setter Property="BorderBrush" Value="Transparent"/>
+      <Setter Property="CornerRadius" Value="12"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
+      <Setter Property="HorizontalContentAlignment" Value="Center"/>
+      <Setter Property="VerticalContentAlignment" Value="Center"/>
+    </Style>
+    <Style Selector="Button.easy:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#66bb6a"/>
+    </Style>
+    <Style Selector="Button.easy:pressed /template/ ContentPresenter">
+      <Setter Property="Background" Value="#4caf50"/>
+    </Style>
+    
+    <!-- 中等难度按钮样式 -->
+    <Style Selector="Button.medium">
+      <Setter Property="Background" Value="#64b5f6"/>
+      <Setter Property="Foreground" Value="White"/>
+      <Setter Property="BorderBrush" Value="Transparent"/>
+      <Setter Property="CornerRadius" Value="12"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
+      <Setter Property="HorizontalContentAlignment" Value="Center"/>
+      <Setter Property="VerticalContentAlignment" Value="Center"/>
+    </Style>
+    <Style Selector="Button.medium:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#42a5f5"/>
+    </Style>
+    <Style Selector="Button.medium:pressed /template/ ContentPresenter">
+      <Setter Property="Background" Value="#2196f3"/>
+    </Style>
+    
+    <!-- 困难难度按钮样式 -->
+    <Style Selector="Button.hard">
+      <Setter Property="Background" Value="#ffb74d"/>
+      <Setter Property="Foreground" Value="White"/>
+      <Setter Property="BorderBrush" Value="Transparent"/>
+      <Setter Property="CornerRadius" Value="12"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
+      <Setter Property="HorizontalContentAlignment" Value="Center"/>
+      <Setter Property="VerticalContentAlignment" Value="Center"/>
+    </Style>
+    <Style Selector="Button.hard:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#ffa726"/>
+    </Style>
+    <Style Selector="Button.hard:pressed /template/ ContentPresenter">
+      <Setter Property="Background" Value="#ff9800"/>
+    </Style>
+    
+    <!-- 专家难度按钮样式 -->
+    <Style Selector="Button.expert">
+      <Setter Property="Background" Value="#e57373"/>
+      <Setter Property="Foreground" Value="White"/>
+      <Setter Property="BorderBrush" Value="Transparent"/>
+      <Setter Property="CornerRadius" Value="12"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
+      <Setter Property="HorizontalContentAlignment" Value="Center"/>
+      <Setter Property="VerticalContentAlignment" Value="Center"/>
+    </Style>
+    <Style Selector="Button.expert:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#ef5350"/>
+    </Style>
+    <Style Selector="Button.expert:pressed /template/ ContentPresenter">
+      <Setter Property="Background" Value="#f44336"/>
+    </Style>
+  </UserControl.Styles>
+  <StackPanel VerticalAlignment="Center" 
+              HorizontalAlignment="Center" 
+              Spacing="25" 
+              Margin="20,20,20,50">
+    
+    <!-- 游戏标题 -->
+    <TextBlock Text="俄罗斯方块" 
+               FontSize="48" 
+               FontWeight="Bold" 
+               HorizontalAlignment="Center">
+      <TextBlock.Foreground>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+          <GradientStop Color="#4fc3f7" Offset="0"/>
+          <GradientStop Color="#66bb6a" Offset="0.3"/>
+          <GradientStop Color="#ffb74d" Offset="0.6"/>
+          <GradientStop Color="#ef5350" Offset="1"/>
+        </LinearGradientBrush>
+      </TextBlock.Foreground>
+      <TextBlock.Effect>
+        <DropShadowEffect Color="#40000000" OffsetX="2" OffsetY="2" BlurRadius="8"/>
+      </TextBlock.Effect>
+    </TextBlock>
+    
+    <!-- 横向排行榜 -->
+    <Border Background="White" 
+            CornerRadius="15" 
+            Padding="25" 
+            MaxWidth="900">
+      <Border.BoxShadow>
+        0 4 12 0 #20000000
+      </Border.BoxShadow>
+      <StackPanel>
+        <TextBlock Text="🏆 排行榜" 
+                   FontSize="20" 
+                   FontWeight="Bold" 
+                   HorizontalAlignment="Center" 
+                   Foreground="#ff6f00" 
+                   Margin="0,0,0,15"/>
+        
+        <!-- 横向排列的前三名 -->
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+          </Grid.ColumnDefinitions>
+          
+          <!-- 第一名 -->
+          <Border Grid.Column="0" 
+                  Background="#ffd54f" 
+                  CornerRadius="12" 
+                  Padding="18" 
+                  Margin="8">
+            <Border.BoxShadow>
+              0 2 8 0 #30000000
+            </Border.BoxShadow>
+            <StackPanel>
+              <TextBlock Text="🥇第一名" 
+                         FontSize="14" 
+                         FontWeight="Bold" 
+                         HorizontalAlignment="Center" 
+                         Foreground="#e65100"/>
+              <TextBlock x:Name="FirstPlaceScore" 
+                         Text="暂无记录" 
+                         FontSize="16" 
+                         FontWeight="Bold" 
+                         HorizontalAlignment="Center" 
+                         Foreground="#e65100"/>
+              <TextBlock x:Name="FirstPlaceInfo" 
+                         Text="" 
+                         FontSize="10" 
+                         HorizontalAlignment="Center" 
+                         Foreground="#e65100"/>
+            </StackPanel>
+          </Border>
+          
+          <!-- 第二名 -->
+          <Border Grid.Column="1" 
+                  Background="#e0e0e0" 
+                  CornerRadius="12" 
+                  Padding="18" 
+                  Margin="8">
+            <Border.BoxShadow>
+              0 2 8 0 #30000000
+            </Border.BoxShadow>
+            <StackPanel>
+              <TextBlock Text="🥈第二名" 
+                         FontSize="14" 
+                         FontWeight="Bold" 
+                         HorizontalAlignment="Center" 
+                         Foreground="#424242"/>
+              <TextBlock x:Name="SecondPlaceScore" 
+                         Text="暂无记录" 
+                         FontSize="14" 
+                         FontWeight="Bold" 
+                         HorizontalAlignment="Center" 
+                         Foreground="#424242"/>
+              <TextBlock x:Name="SecondPlaceInfo" 
+                         Text="" 
+                         FontSize="10" 
+                         HorizontalAlignment="Center" 
+                         Foreground="#424242"/>
+            </StackPanel>
+          </Border>
+          
+          <!-- 第三名 -->
+          <Border Grid.Column="2" 
+                  Background="#ffab91" 
+                  CornerRadius="12" 
+                  Padding="18" 
+                  Margin="8">
+            <Border.BoxShadow>
+              0 2 8 0 #30000000
+            </Border.BoxShadow>
+            <StackPanel>
+              <TextBlock Text="🥉第三名" 
+                         FontSize="14" 
+                         FontWeight="Bold" 
+                         HorizontalAlignment="Center" 
+                         Foreground="#d84315"/>
+              <TextBlock x:Name="ThirdPlaceScore" 
+                         Text="暂无记录" 
+                         FontSize="14" 
+                         FontWeight="Bold" 
+                         HorizontalAlignment="Center" 
+                         Foreground="#d84315"/>
+              <TextBlock x:Name="ThirdPlaceInfo" 
+                         Text="" 
+                         FontSize="10" 
+                         HorizontalAlignment="Center" 
+                         Foreground="#d84315"/>
+            </StackPanel>
+          </Border>
+        </Grid>
+      </StackPanel>
+    </Border>
+    
+    <!-- 难度选择 -->
+      <StackPanel Spacing="15">
+        <TextBlock Text="选择难度:" 
+                   FontSize="24" 
+                   FontWeight="SemiBold" 
+                   HorizontalAlignment="Center" 
+                   Foreground="#37474f"/>
+        
+        <StackPanel Spacing="10">
+          <Button x:Name="EasyButton" 
+                  Content="简单 (慢速)" 
+                  FontSize="18" 
+                  Width="200" 
+                  Height="50" 
+                  Classes="easy"
+                  HorizontalAlignment="Center"/>
+          
+          <Button x:Name="MediumButton" 
+                  Content="中等 (正常速度)" 
+                  FontSize="18" 
+                  Width="200" 
+                  Height="50" 
+                  Classes="medium"
+                  HorizontalAlignment="Center"/>
+          
+          <Button x:Name="HardButton" 
+                  Content="困难 (快速)" 
+                  FontSize="18" 
+                  Width="200" 
+                  Height="50" 
+                  Classes="hard"
+                  HorizontalAlignment="Center"/>
+          
+          <Button x:Name="ExpertButton" 
+                  Content="专家 (极速)" 
+                  FontSize="18" 
+                  Width="200" 
+                  Height="50" 
+                  Classes="expert"
+                  HorizontalAlignment="Center"/>
+        </StackPanel>
+    </StackPanel>
+    
+    <!-- 难度说明 -->
+      <StackPanel Spacing="5" Margin="90,0,0,0">
+        <TextBlock Text="难度说明:" 
+                   FontSize="16" 
+                   FontWeight="SemiBold" 
+                   HorizontalAlignment="Left" 
+                   Foreground="#37474f"/>
+        <TextBlock Text="• 简单: 初始速度较慢，升级速度缓慢" 
+                   FontSize="12" 
+                   HorizontalAlignment="Left" 
+                   Foreground="#616161"/>
+        <TextBlock Text="• 中等: 标准游戏速度" 
+                   FontSize="12" 
+                   HorizontalAlignment="Left" 
+                   Foreground="#616161"/>
+        <TextBlock Text="• 困难: 初始速度较快，升级速度加快" 
+                   FontSize="12" 
+                   HorizontalAlignment="Left" 
+                   Foreground="#616161"/>
+        <TextBlock Text="• 专家: 极快速度，挑战极限" 
+                   FontSize="12" 
+                   HorizontalAlignment="Left" 
+                   Foreground="#616161"/>
+    </StackPanel>
+    
+  </StackPanel>
+</UserControl>
