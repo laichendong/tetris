@@ -6,6 +6,16 @@
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <NoWarn>$(NoWarn);CA1416</NoWarn>
+    <ApplicationIcon Condition="'$(TargetFramework)' == 'net8.0' AND '$(RuntimeIdentifier)' == 'osx-x64'">Assets/tetris.png</ApplicationIcon>
+    <ApplicationIcon Condition="'$(TargetFramework)' == 'net8.0' AND '$(RuntimeIdentifier)' == 'win-x64'">Assets/tetris.ico</ApplicationIcon>
+    
+    <!-- 单文件发布配置 -->
+    <PublishSingleFile Condition="'$(PublishSingleFile)' == 'true'">true</PublishSingleFile>
+    <SelfContained Condition="'$(PublishSingleFile)' == 'true'">true</SelfContained>
+    <PublishTrimmed Condition="'$(PublishSingleFile)' == 'true'">false</PublishTrimmed>
+    <IncludeNativeLibrariesForSelfExtract Condition="'$(PublishSingleFile)' == 'true'">true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile Condition="'$(PublishSingleFile)' == 'true'">true</EnableCompressionInSingleFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,6 +23,7 @@
     <PackageReference Include="Avalonia.Desktop" Version="11.2.1" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.1" />
     <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.1" />
+    <PackageReference Include="System.Windows.Extensions" Version="8.0.0" />
     <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
     <PackageReference Include="Avalonia.Diagnostics" Version="11.2.1">
       <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>

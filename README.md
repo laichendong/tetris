@@ -2,6 +2,8 @@
 
 一个使用 C# 和 Avalonia UI 框架开发的现代化俄罗斯方块游戏，支持跨平台运行。
 
+<img src="./README.assets/image-20250616100646308.png" alt="image-20250616100646308" style="zoom:50%;" /><img src="./README.assets/image-20250616100727736.png" alt="image-20250616100727736" style="zoom:50%;" />
+
 ## 🎮 游戏特性
 
 ### 核心功能

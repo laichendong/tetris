@@ -4,6 +4,8 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Avalonia.Platform;
+using System.Media;
+using System.Threading;
 
 namespace TetrisGame.Models
 {
@@ -14,6 +16,8 @@ namespace TetrisGame.Models
         private string? _tempClearSoundFile; // 预加载的消行音效临时文件
         private bool _isPlaying;
         private bool _disposed;
+        private CancellationTokenSource? _backgroundMusicCancellation; // 用于取消背景音乐播放
+        private SoundPlayer? _backgroundMusicPlayer; // Windows下的背景音乐播放器
 
         public bool IsPlaying => _isPlaying;
         
@@ -28,11 +32,11 @@ namespace TetrisGame.Models
             try
             {
                 // 从嵌入资源加载消除行音效文件
-                var assets = AssetLoader.Open(new Uri("avares://TetrisGame/bgm/clear.mp3"));
+                var assets = AssetLoader.Open(new Uri("avares://TetrisGame/bgm/clear.wav"));
                 
                 // 创建临时文件
                 _tempClearSoundFile = Path.GetTempFileName();
-                _tempClearSoundFile = Path.ChangeExtension(_tempClearSoundFile, ".mp3");
+                _tempClearSoundFile = Path.ChangeExtension(_tempClearSoundFile, ".wav");
                 
                 using (var fileStream = File.Create(_tempClearSoundFile))
                 {
@@ -55,11 +59,11 @@ namespace TetrisGame.Models
                 StopBackgroundMusic();
                 
                 // 从嵌入资源加载音频文件
-                var assets = AssetLoader.Open(new Uri("avares://TetrisGame/bgm/bgm.mp3"));
+                var assets = AssetLoader.Open(new Uri("avares://TetrisGame/bgm/bgm.wav"));
                 
                 // 创建临时文件
                 _tempAudioFile = Path.GetTempFileName();
-                _tempAudioFile = Path.ChangeExtension(_tempAudioFile, ".mp3");
+                _tempAudioFile = Path.ChangeExtension(_tempAudioFile, ".wav");
                 
                 using (var fileStream = File.Create(_tempAudioFile))
                 {
@@ -80,15 +84,34 @@ namespace TetrisGame.Models
                 }
                 else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
-                    // Windows 使用简化的 PowerShell 命令
-                    _audioProcess = Process.Start(new ProcessStartInfo
+                    // Windows 使用 SoundPlayer 播放音频
+                    _backgroundMusicCancellation = new CancellationTokenSource();
+                    var cancellationToken = _backgroundMusicCancellation.Token;
+                    
+                    _backgroundMusicPlayer = new SoundPlayer(_tempAudioFile);
+                    _backgroundMusicPlayer.LoadAsync();
+                    
+                    // 使用PlayLooping进行循环播放，这样可以更好地控制停止
+                    Task.Run(() =>
                     {
-                        FileName = "powershell",
-                        Arguments = $"-Command \"Add-Type -AssemblyName presentationCore; $m = New-Object System.Windows.Media.MediaPlayer; $m.Open('{_tempAudioFile}'); $m.Play(); Start-Sleep 3\"",
-                        UseShellExecute = false,
-                        CreateNoWindow = true,
-                        WindowStyle = ProcessWindowStyle.Hidden
-                    });
+                        try
+                        {
+                            // 等待加载完成
+                            Thread.Sleep(500);
+                            
+                            if (!cancellationToken.IsCancellationRequested && _isPlaying && !_disposed)
+                            {
+                                _backgroundMusicPlayer.PlayLooping();
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Windows音频播放错误: {ex.Message}");
+                        }
+                    }, cancellationToken);
+                    
+                    // 创建一个虚拟进程对象以保持兼容性
+                    _audioProcess = new Process();
                 }
                 else
                 {
@@ -150,6 +173,25 @@ namespace TetrisGame.Models
         {
             try
             {
+                _isPlaying = false;
+                
+                // 取消Windows下的背景音乐播放
+                if (_backgroundMusicCancellation != null)
+                {
+                    _backgroundMusicCancellation.Cancel();
+                    _backgroundMusicCancellation.Dispose();
+                    _backgroundMusicCancellation = null;
+                }
+                
+                // 停止Windows下的SoundPlayer
+                if (_backgroundMusicPlayer != null)
+                {
+                    _backgroundMusicPlayer.Stop();
+                    _backgroundMusicPlayer.Dispose();
+                    _backgroundMusicPlayer = null;
+                }
+                
+                // 停止其他平台的音频进程
                 if (_audioProcess != null && !_audioProcess.HasExited)
                 {
                     _audioProcess.Kill();
@@ -157,34 +199,28 @@ namespace TetrisGame.Models
                 }
                 _audioProcess?.Dispose();
                 _audioProcess = null;
-                
-                try
-                {
-                    if (_audioProcess?.HasExited == false)
-                    {
-                        _audioProcess?.Kill();
-                        _audioProcess?.Dispose();
-                    }
-                }
-                catch
-                {
-                    // 忽略进程终止错误
-                }
-                
-                _audioProcess = null;
-                _audioProcess = null;
-                
-                _isPlaying = false;
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"停止背景音乐时出错: {ex.Message}");
-                _isPlaying = false;
             }
             finally
             {
-                _audioProcess?.Dispose();
-                _audioProcess = null;
+                _isPlaying = false;
+                
+                // 清理临时文件
+                if (!string.IsNullOrEmpty(_tempAudioFile) && File.Exists(_tempAudioFile))
+                {
+                    try
+                    {
+                        File.Delete(_tempAudioFile);
+                        _tempAudioFile = null;
+                    }
+                    catch
+                    {
+                        // 忽略删除临时文件的错误
+                    }
+                }
             }
         }
 
@@ -196,11 +232,11 @@ namespace TetrisGame.Models
                 StopBackgroundMusic();
                 
                 // 从嵌入资源加载游戏结束音效文件
-                var assets = AssetLoader.Open(new Uri("avares://TetrisGame/bgm/gameover.mp3"));
+                var assets = AssetLoader.Open(new Uri("avares://TetrisGame/bgm/gameover.wav"));
                 
                 // 创建临时文件
                 var tempGameOverFile = Path.GetTempFileName();
-                tempGameOverFile = Path.ChangeExtension(tempGameOverFile, ".mp3");
+                tempGameOverFile = Path.ChangeExtension(tempGameOverFile, ".wav");
                 
                 using (var fileStream = File.Create(tempGameOverFile))
                 {
@@ -221,17 +257,28 @@ namespace TetrisGame.Models
                     });
                 }
                 else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
-                    // Windows 使用简化的 PowerShell 命令
-                    gameOverProcess = Process.Start(new ProcessStartInfo
                     {
-                        FileName = "powershell",
-                        Arguments = $"-Command \"Add-Type -AssemblyName presentationCore; $m = New-Object System.Windows.Media.MediaPlayer; $m.Open('{tempGameOverFile}'); $m.Play(); Start-Sleep 3\"",
-                        UseShellExecute = false,
-                        CreateNoWindow = true,
-                        WindowStyle = ProcessWindowStyle.Hidden
-                    });
-                }
+                        // Windows 使用 SoundPlayer 播放音效，使用异步播放减少延迟
+                        Task.Run(async () =>
+                        {
+                            try
+                            {
+                                using var soundPlayer = new SoundPlayer(tempGameOverFile);
+                                // 使用异步播放减少延迟
+                                soundPlayer.Play();
+                                
+                                // 等待音效播放完成（估算时间）
+                                await Task.Delay(2000); // 游戏结束音效较长
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"Windows游戏结束音效播放错误: {ex.Message}");
+                            }
+                        });
+                        
+                        // 创建一个虚拟进程对象以保持兼容性
+                        gameOverProcess = new Process();
+                    }
                 else
                 {
                     // Linux 使用 paplay
@@ -301,15 +348,26 @@ namespace TetrisGame.Models
                     }
                     else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                     {
-                        // Windows 使用简化的 PowerShell 命令
-                        clearSoundProcess = Process.Start(new ProcessStartInfo
+                        // Windows 使用 SoundPlayer 播放音效，使用异步播放减少延迟
+                        Task.Run(async () =>
                         {
-                            FileName = "powershell",
-                            Arguments = $"-Command \"Add-Type -AssemblyName presentationCore; $m = New-Object System.Windows.Media.MediaPlayer; $m.Open('{_tempClearSoundFile}'); $m.Play(); Start-Sleep 1\"",
-                            UseShellExecute = false,
-                            CreateNoWindow = true,
-                            WindowStyle = ProcessWindowStyle.Hidden
+                            try
+                            {
+                                using var soundPlayer = new SoundPlayer(_tempClearSoundFile);
+                                // 使用异步播放减少延迟
+                                soundPlayer.Play();
+                                
+                                // 等待音效播放完成（估算时间）
+                                await Task.Delay(800); // 消行音效时长
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"Windows消行音效播放错误: {ex.Message}");
+                            }
                         });
+                        
+                        // 创建一个虚拟进程对象以保持兼容性
+                        clearSoundProcess = new Process();
                     }
                     else
                     {
@@ -346,7 +404,7 @@ namespace TetrisGame.Models
         /// </summary>
         public void PlayClickSound()
         {
-            PlaySoundEffect("avares://TetrisGame/bgm/click.mp3", 1.0f);
+            PlaySoundEffect("avares://TetrisGame/bgm/click.wav", 1.0f);
         }
         
         /// <summary>
@@ -354,7 +412,7 @@ namespace TetrisGame.Models
         /// </summary>
         public void PlayMoveSound()
         {
-            PlaySoundEffect("avares://TetrisGame/bgm/move.mp3", 1.0f);
+            PlaySoundEffect("avares://TetrisGame/bgm/move.wav", 1.0f);
         }
         
         /// <summary>
@@ -362,7 +420,7 @@ namespace TetrisGame.Models
         /// </summary>
         public void PlayRotateSound()
         {
-            PlaySoundEffect("avares://TetrisGame/bgm/rotate.mp3", 1.0f);
+            PlaySoundEffect("avares://TetrisGame/bgm/rotate.wav", 1.0f);
         }
         
         /// <summary>
@@ -370,7 +428,7 @@ namespace TetrisGame.Models
         /// </summary>
         public void PlayFallSound()
         {
-            PlaySoundEffect("avares://TetrisGame/bgm/fall.mp3", 1.0f);
+            PlaySoundEffect("avares://TetrisGame/bgm/fall.wav", 1.0f);
         }
         
         /// <summary>
@@ -387,7 +445,7 @@ namespace TetrisGame.Models
                 
                 // 创建临时文件
                 var tempSoundFile = Path.GetTempFileName();
-                tempSoundFile = Path.ChangeExtension(tempSoundFile, ".mp3");
+                tempSoundFile = Path.ChangeExtension(tempSoundFile, ".wav");
                 
                 using (var fileStream = File.Create(tempSoundFile))
                 {
@@ -409,15 +467,43 @@ namespace TetrisGame.Models
                 }
                 else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
-                    // Windows 使用简化的 PowerShell 命令
-                    soundProcess = Process.Start(new ProcessStartInfo
+                    // Windows 使用 SoundPlayer 播放音效
+                    Task.Run(() =>
                     {
-                        FileName = "powershell",
-                        Arguments = $"-Command \"Add-Type -AssemblyName presentationCore; $m = New-Object System.Windows.Media.MediaPlayer; $m.Open('{tempSoundFile}'); $m.Play(); Start-Sleep 1\"",
-                        UseShellExecute = false,
-                        CreateNoWindow = true,
-                        WindowStyle = ProcessWindowStyle.Hidden
+                        try
+                        {
+                            using var soundPlayer = new SoundPlayer(tempSoundFile);
+                            soundPlayer.LoadAsync();
+                            
+                            // 等待加载完成
+                            Thread.Sleep(200);
+                            
+                            // 使用同步播放确保音效完整播放
+                            soundPlayer.PlaySync();
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Windows音效播放错误: {ex.Message}");
+                        }
+                        finally
+                        {
+                            // 清理临时文件
+                            if (File.Exists(tempSoundFile))
+                            {
+                                try
+                                {
+                                    File.Delete(tempSoundFile);
+                                }
+                                catch
+                                {
+                                    // 忽略删除临时文件的错误
+                                }
+                            }
+                        }
                     });
+                    
+                    // 创建一个虚拟进程对象以保持兼容性
+                    soundProcess = new Process();
                 }
                 else
                 {
@@ -471,6 +557,21 @@ namespace TetrisGame.Models
             if (_disposed) return;
             _disposed = true;
             StopBackgroundMusic();
+            
+            // 清理Windows下的背景音乐资源
+            if (_backgroundMusicCancellation != null)
+            {
+                _backgroundMusicCancellation.Cancel();
+                _backgroundMusicCancellation.Dispose();
+                _backgroundMusicCancellation = null;
+            }
+            
+            if (_backgroundMusicPlayer != null)
+            {
+                _backgroundMusicPlayer.Stop();
+                _backgroundMusicPlayer.Dispose();
+                _backgroundMusicPlayer = null;
+            }
             
             _audioProcess?.Dispose();
             _audioProcess = null;

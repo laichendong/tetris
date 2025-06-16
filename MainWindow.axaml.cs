@@ -2,6 +2,8 @@ using System;
 using Avalonia.Controls;
 using TetrisGame.Views;
 using TetrisGame.Controllers;
+using Avalonia.Platform;
+using Avalonia.Media.Imaging;
 
 namespace TetrisGame;
 
@@ -14,6 +16,9 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        // 设置窗口图标
+        var assets = AssetLoader.Open(new Uri("avares://TetrisGame/Assets/tetris.png"));
+        Icon = new WindowIcon(new Bitmap(assets));
         
         // 获取控件引用
         _menuView = this.FindControl<MenuView>("MenuView");
