@@ -90,8 +90,15 @@ namespace TetrisGame.Models
                         var audioFileReader = new AudioFileReader(tempFile);
                         var sampleProvider = audioFileReader.ToSampleProvider();
                         
+                        // 重采样到标准采样率 (44100Hz)
+                        var resampledProvider = sampleProvider.ToWaveProvider().ToSampleProvider();
+                        if (sampleProvider.WaveFormat.SampleRate != 44100)
+                        {
+                            resampledProvider = new WdlResamplingSampleProvider(sampleProvider, 44100);
+                        }
+                        
                         // 创建循环播放提供器
-                        var loopingSampleProvider = new LoopingSampleProvider(sampleProvider);
+                        var loopingSampleProvider = new LoopingSampleProvider(resampledProvider);
                         
                         // 设置背景音乐音量 (30%)
                         _backgroundMusicProvider = new VolumeSampleProvider(loopingSampleProvider)
@@ -198,7 +205,7 @@ namespace TetrisGame.Models
         public void PlayGameOverSound()
         {
             StopBackgroundMusic();
-            PlaySoundEffect("avares://TetrisGame/bgm/gameover.wav", 1.0f);
+            PlaySoundEffect("avares://TetrisGame/bgm/gameover.wav", 0.9f);
         }
 
         /// <summary>
@@ -206,7 +213,7 @@ namespace TetrisGame.Models
         /// </summary>
         public void PlayLineClearSound()
         {
-            PlaySoundEffect("avares://TetrisGame/bgm/clear.wav", 1.0f);   
+            PlaySoundEffect("avares://TetrisGame/bgm/clear.wav", 0.9f);   
         }
 
         /// <summary>
@@ -214,7 +221,7 @@ namespace TetrisGame.Models
         /// </summary>
         public void PlayClickSound()
         {
-            PlaySoundEffect("avares://TetrisGame/bgm/click.wav", 1.0f);
+            PlaySoundEffect("avares://TetrisGame/bgm/click.wav", 0.9f);
         }
         
         /// <summary>
@@ -222,7 +229,7 @@ namespace TetrisGame.Models
         /// </summary>
         public void PlayMoveSound()
         {
-            PlaySoundEffect("avares://TetrisGame/bgm/move.wav", 1.0f);
+            PlaySoundEffect("avares://TetrisGame/bgm/move.wav", 0.9f);
         }
         
         /// <summary>
@@ -230,7 +237,7 @@ namespace TetrisGame.Models
         /// </summary>
         public void PlayRotateSound()
         {
-            PlaySoundEffect("avares://TetrisGame/bgm/rotate.wav", 1.0f);
+            PlaySoundEffect("avares://TetrisGame/bgm/rotate.wav", 0.9f);
         }
         
         /// <summary>
@@ -238,7 +245,7 @@ namespace TetrisGame.Models
         /// </summary>
         public void PlayFallSound()
         {
-            PlaySoundEffect("avares://TetrisGame/bgm/fall.wav", 1.0f);
+            PlaySoundEffect("avares://TetrisGame/bgm/fall.wav", 0.9f);
         }
         
         /// <summary>
@@ -292,8 +299,15 @@ namespace TetrisGame.Models
                                 var audioFileReader = new AudioFileReader(tempFile);
                                 var sampleProvider = audioFileReader.ToSampleProvider();
                                 
+                                // 重采样到标准采样率 (44100Hz)
+                                var resampledProvider = sampleProvider;
+                                if (sampleProvider.WaveFormat.SampleRate != 44100)
+                                {
+                                    resampledProvider = new WdlResamplingSampleProvider(sampleProvider, 44100);
+                                }
+                                
                                 // 设置音效音量
-                                var volumeProvider = new VolumeSampleProvider(sampleProvider)
+                                var volumeProvider = new VolumeSampleProvider(resampledProvider)
                                 {
                                     Volume = volume
                                 };
