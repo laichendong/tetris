@@ -2,7 +2,7 @@
 
 一个使用 C# 和 Avalonia UI 框架开发的现代化俄罗斯方块游戏，支持跨平台运行，具备完整的音效系统和用户友好的界面。
 
-<img src="./README.assets/image-20250616100646308.png" alt="游戏主菜单" style="zoom:50%;" /><img src="./README.assets/image-20250616100727736.png" alt="游戏界面" style="zoom:50%;" />
+<img src="./README.assets/image-20250616100646308.png" alt="游戏主菜单" style="zoom:20%;" /><img src="./README.assets/image-20250616100727736.png" alt="游戏界面" style="zoom:20%;" />
 
 ## 🎮 游戏特性
 
