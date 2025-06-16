@@ -2,13 +2,15 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="454" d:DesignHeight="784"
         xmlns:views="clr-namespace:TetrisGame.Views"
         x:Class="TetrisGame.MainWindow"
         Title="俄罗斯方块"
         Width="454" Height="784"
         CanResize="False"
         WindowStartupLocation="CenterScreen"
-        Background="#202020">
+        Background="#202020"
+        Icon="avares://TetrisGame/Assets/tetris.ico">
     <Grid>
         <!-- 菜单视图 -->
         <views:MenuView x:Name="MenuView" />

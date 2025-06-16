@@ -7,8 +7,11 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <NoWarn>$(NoWarn);CA1416</NoWarn>
-    <ApplicationIcon Condition="'$(TargetFramework)' == 'net8.0' AND '$(RuntimeIdentifier)' == 'osx-x64'">Assets/tetris.png</ApplicationIcon>
-    <ApplicationIcon Condition="'$(TargetFramework)' == 'net8.0' AND '$(RuntimeIdentifier)' == 'win-x64'">Assets/tetris.ico</ApplicationIcon>
+    <!-- Windows平台图标配置 -->
+    <ApplicationIcon Condition="$([MSBuild]::IsOSPlatform('Windows'))">Assets/tetris.ico</ApplicationIcon>
+    
+    <!-- macOS平台使用CFBundleIconFile -->
+    <CFBundleIconFile Condition="$([MSBuild]::IsOSPlatform('OSX'))">tetris.icns</CFBundleIconFile>
     
     <!-- 单文件发布配置 -->
     <PublishSingleFile Condition="'$(PublishSingleFile)' == 'true'">true</PublishSingleFile>
