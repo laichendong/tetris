@@ -292,7 +292,6 @@ namespace TetrisGame.Models
                                 // 检查音频设备和混音器状态
                                 if (_waveOut == null || _mixer == null)
                                 {
-                                    System.Diagnostics.Debug.WriteLine("NAudio未正确初始化，无法播放音效");
                                     return;
                                 }
                                 
@@ -336,10 +335,9 @@ namespace TetrisGame.Models
                                     _waveOut?.Play();
                                 }
                             }
-                            catch (Exception ex)
+                            catch
                             {
-                                // 输出详细的播放错误信息
-                                System.Diagnostics.Debug.WriteLine($"Windows音效播放失败: {ex.Message}");
+                                // 静默处理播放错误
                             }
                         });
                     }

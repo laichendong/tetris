@@ -5,11 +5,7 @@
              x:Class="TetrisGame.Views.GameView"
              Focusable="True">
   <UserControl.Background>
-    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-      <GradientStop Color="#f8f9fa" Offset="0"/>
-      <GradientStop Color="#e9ecef" Offset="0.5"/>
-      <GradientStop Color="#dee2e6" Offset="1"/>
-    </LinearGradientBrush>
+    <SolidColorBrush Color="#f8f9fa"/>
   </UserControl.Background>
   <Grid>
     <Grid.RowDefinitions>
